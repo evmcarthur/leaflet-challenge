@@ -20,10 +20,11 @@ fetch("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.geojs
 
             // Define the marker options based on magnitude and depth
             var markerOptions = {
-                radius: magnitude * 3,
-                fillOpacity: 1 - (depth / 70),
-                color: getColor(depth), // Assign color based on depth
-                fillColor: getColor(depth) // Assign color based on depth
+                radius: magnitude * 2,
+                fillOpacity: 1,
+                colour: 'black',
+                weight: 2,
+                fillColor: getColor(depth),
             };
 
             // Create the marker
@@ -31,7 +32,7 @@ fetch("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.geojs
 
             // Add a popup with earthquake details
             marker.bindPopup(`
-                <strong>Title:</strong> ${title}<br>
+                <strong>Place:</strong> ${place}<br>
                 <strong>Magnitude:</strong> ${magnitude}<br>
                 <strong>Depth:</strong> ${depth} km
             `);
@@ -41,13 +42,21 @@ fetch("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.geojs
         });
     });
 
-    // Load the GeoJSON file from the local folder
-fetch('PB2002_plates.geojson')
-    .then(response => response.json())
-    .then(data => {
-        // Create a GeoJSON layer and add it to the map
-        L.geoJSON(data).addTo(map);
+ // Load the tectonic plate data from the provided URL
+fetch("https://raw.githubusercontent.com/fraxen/tectonicplates/master/GeoJSON/PB2002_boundaries.json")
+.then(response => response.json())
+.then(data => {
+    // Create a GeoJSON layer for the tectonic plate data
+    var tectonicLayer = L.geoJSON(data, {
+        style: {
+            color: '#FF0000', // Set the color of the polyline
+            weight: 2, // Set the weight of the polyline
+        },
     });
+
+    // Add the tectonic layer to the map
+    tectonicLayer.addTo(map);
+});
 
 // Create a legend control
 var legend = L.control({ position: 'bottomright' });
@@ -87,3 +96,4 @@ function getColor(depth) {
         depth >= 10 ? '#FED976' :
         '#FFEDA0';
 }
+
